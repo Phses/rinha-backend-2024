@@ -1,0 +1,15 @@
+CREATE TABLE Cliente(
+	Id SERIAL PRIMARY KEY,
+	Limite INT NOT NULL,
+	SaldoInicial INT NOT NULL
+)
+
+CREATE TABLE Transacao(
+	Id SERIAL PRIMARY KEY,
+	ClienteId INT NOT NULL,
+	Valor INT NOT NULL,
+	Descricao VARCHAR(10) NOT NULL,
+	RealizadaEm DATETIME NOT NULL,
+
+	FOREIGN KEY (ClientId) REFERENCES Cliente (Id)
+)
