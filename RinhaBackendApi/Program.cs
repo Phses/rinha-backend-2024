@@ -1,13 +1,21 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using RinhaBackendApi;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+Console.WriteLine(builder.Configuration.GetConnectionString("pgsql"));
+
+builder.Services.AddNpgsqlDataSource(builder.Configuration.GetConnectionString("pgsql"));
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<TransactionDb>();
+builder.Services.AddSingleton<ExtratoDb>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,29 +24,44 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+var transactionDb = app.Services.GetRequiredService<TransactionDb>();
+var extratoDb = app.Services.GetRequiredService<ExtratoDb>();
 
-app.MapGet("/weatherforecast", () =>
+app.MapPost("/clients/{id}/transacoes", async Task<Results<Ok<TransacaoResp>, NotFound, BadRequest ,UnprocessableEntity>> (int id, [FromBody] TransacaoReq transacao) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var tipoValido = transacao.Tipo == "d" || transacao.Tipo == "c";
+
+    if (!tipoValido)
+        return TypedResults.BadRequest();
+
+    var result = await transactionDb.Add(transacao, id);
+
+    if (result.Status == ResultStatus.Success)
+        return TypedResults.Ok(result.Data);
+    if (result.Status == ResultStatus.EntityNotFound)
+        return TypedResults.NotFound();
+    if (result.Status == ResultStatus.NotProcessed)
+        return TypedResults.UnprocessableEntity();
+
+    throw new InvalidOperationException();
+
 })
-.WithName("GetWeatherForecast")
+.WithName("AddTransacao")
+.WithOpenApi();
+
+app.MapGet("/clients/{id}/extrato", async Task<Results<Ok<Extrato>, NotFound>> ([FromRoute]int id) =>
+{
+    var result = await extratoDb.Get(id);
+
+    if (result.Status == ResultStatus.EntityNotFound)
+        return TypedResults.NotFound();
+    if (result.Status == ResultStatus.Success)
+        return TypedResults.Ok(result.Data);
+
+    throw new InvalidOperationException();
+})
+.WithName("GetExtrato")
 .WithOpenApi();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

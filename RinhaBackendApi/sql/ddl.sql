@@ -1,15 +1,17 @@
+
 CREATE TABLE Cliente(
 	Id SERIAL PRIMARY KEY,
 	Limite INT NOT NULL,
-	SaldoInicial INT NOT NULL
-)
+	Saldo INT NOT NULL
+);
 
 CREATE TABLE Transacao(
 	Id SERIAL PRIMARY KEY,
 	ClienteId INT NOT NULL,
 	Valor INT NOT NULL,
+	Tipo CHAR(1) not null,
 	Descricao VARCHAR(10) NOT NULL,
-	RealizadaEm DATETIME NOT NULL,
+	RealizadaEm TIMESTAMP DEFAULT now(),
 
-	FOREIGN KEY (ClientId) REFERENCES Cliente (Id)
-)
+	FOREIGN KEY (ClienteId) REFERENCES Cliente (Id)
+);
