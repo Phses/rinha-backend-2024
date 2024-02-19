@@ -1,10 +1,10 @@
-version: "3.5"
+version: "1.0"
 
 services:
   api01: &api
     # Lembre-se de que seu serviço HTTP deve estar hospedado num repositório
     # publicamente acessível! Ex.: hub.docker.com
-    image: ana/minha-api-matadora:latest
+    image: rinha-backend-2024:latest
     hostname: api01
     environment:
       - DB_HOSTNAME=db
@@ -13,7 +13,7 @@ services:
     # mas é comum as pessoas o fazerem para testarem suas APIs e conectarem
     # ao banco de dados na fase de desenvolvimento.
     ports:
-      - "8081:8080"
+      - "8000:8080"
     depends_on:
       - db
     deploy:
@@ -29,7 +29,7 @@ services:
     environment:
       - DB_HOSTNAME=db
     ports:
-      - "8082:8080"
+      - "8000:8080"
  
   nginx:
     image: nginx:latest
@@ -57,7 +57,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./script.sql:/docker-entrypoint-initdb.d/script.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     deploy:
       resources:
         limits:

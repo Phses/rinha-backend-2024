@@ -27,7 +27,7 @@ app.UseHttpsRedirection();
 var transactionDb = app.Services.GetRequiredService<TransactionDb>();
 var extratoDb = app.Services.GetRequiredService<ExtratoDb>();
 
-app.MapPost("/clients/{id}/transacoes", async Task<Results<Ok<TransacaoResp>, NotFound, BadRequest ,UnprocessableEntity>> (int id, [FromBody] TransacaoReq transacao) =>
+app.MapPost("/clientes/{id}/transacoes", async Task<Results<Ok<TransacaoResp>, NotFound, BadRequest ,UnprocessableEntity>> (int id, [FromBody] TransacaoReq transacao) =>
 {
     var tipoValido = transacao.Tipo == "d" || transacao.Tipo == "c";
 
@@ -49,7 +49,7 @@ app.MapPost("/clients/{id}/transacoes", async Task<Results<Ok<TransacaoResp>, No
 .WithName("AddTransacao")
 .WithOpenApi();
 
-app.MapGet("/clients/{id}/extrato", async Task<Results<Ok<Extrato>, NotFound>> ([FromRoute]int id) =>
+app.MapGet("/clientes/{id}/extrato", async Task<Results<Ok<Extrato>, NotFound>> ([FromRoute]int id) =>
 {
     var result = await extratoDb.Get(id);
 
