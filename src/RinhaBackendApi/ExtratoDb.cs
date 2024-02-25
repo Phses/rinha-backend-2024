@@ -2,34 +2,27 @@
 
 namespace RinhaBackendApi;
 
-public class ExtratoDb
+public class ExtratoDb(NpgsqlDataSource dataSource)
 {
-    private readonly NpgsqlDataSource _dataSource;
-    private readonly NpgsqlConnection _connection;
-    public ExtratoDb(NpgsqlDataSource dataSource)
-    {
-        _dataSource = dataSource;
-        _connection = _dataSource.OpenConnection();
-    }
     public async Task<Result<Extrato>> Get(int clienteId)
     {
-        await _connection.OpenAsync();
+        using var connection = await dataSource.OpenConnectionAsync();
 
-        var existe = await CheckSeClienteExiste(clienteId);
+        var existe = await CheckSeClienteExiste(connection ,clienteId);
 
         if(!existe)
             return Result<Extrato>.EntityNotFound();
 
-        var saldo = await GetSaldo(clienteId);
+        var saldo = await GetSaldo(clienteId, connection);
 
-        var transacoes = await GetTransacoes(clienteId);
+        var transacoes = await GetTransacoes(clienteId, connection);
 
         return new Extrato(saldo, transacoes);
     }
 
-    private async Task<bool> CheckSeClienteExiste(int clienteId)
+    private static async Task<bool> CheckSeClienteExiste(NpgsqlConnection connection, int clienteId)
     {
-        await using var cmd = new NpgsqlCommand(Queries.CheckSeClienteExiste, _connection);
+        await using var cmd = new NpgsqlCommand(Queries.CheckSeClienteExiste, connection);
 
         cmd.Parameters.AddWithValue("clienteId", clienteId);
         var resultObj = await cmd.ExecuteScalarAsync();
@@ -38,9 +31,9 @@ public class ExtratoDb
         return result == 1;
     }
 
-    private async Task<Saldo?> GetSaldo(int clienteId)
+    private static async Task<Saldo?> GetSaldo(int clienteId, NpgsqlConnection connection)
     {
-        await using var cmd = new NpgsqlCommand(Queries.GetSaldo, _connection);
+        await using var cmd = new NpgsqlCommand(Queries.GetSaldo, connection);
         cmd.Parameters.AddWithValue("clienteId", clienteId);
         using var reader = await cmd.ExecuteReaderAsync();
 
@@ -56,9 +49,9 @@ public class ExtratoDb
         return null;
     }
 
-    private async Task<List<Transacao>> GetTransacoes(int clienteId)
+    private static async Task<List<Transacao>> GetTransacoes(int clienteId, NpgsqlConnection connection)
     {
-        await using var cmd = new NpgsqlCommand(Queries.GetTransacoes, _connection);
+        await using var cmd = new NpgsqlCommand(Queries.GetTransacoes, connection);
         cmd.Parameters.AddWithValue("clienteId", clienteId);
         using var reader = await cmd.ExecuteReaderAsync();
         
