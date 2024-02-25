@@ -2,28 +2,28 @@
 
 namespace RinhaBackendApi;
 
-public class TransactionDb(NpgsqlDataSource _dataSource)
+public class TransactionDb(NpgsqlConnection _connection)
 {
     public async Task<Result<TransacaoResp>> Add(TransacaoReq transacao, int clienteId)
     {
-        await using var connection = await _dataSource.OpenConnectionAsync();
+        await _connection.OpenAsync();
         
-        var existe = await CheckSeClienteExiste(connection, clienteId);
+        var existe = await CheckSeClienteExiste(clienteId);
 
         if(!existe)
             return Result<TransacaoResp>.EntityNotFound();
 
-        var atualizado = await UpdateClinte(connection, transacao, clienteId);
+        var atualizado = await UpdateClinte(transacao, clienteId);
 
         if (!atualizado)
             return Result<TransacaoResp>.EntityNotProcessed();
 
-        return await InsertTransacao(connection, transacao, clienteId);
+        return await InsertTransacao(transacao, clienteId);
     }
 
-    private static async Task<bool> CheckSeClienteExiste(NpgsqlConnection connection, int clienteId)
+    private async Task<bool> CheckSeClienteExiste(int clienteId)
     {
-        await using var cmd = new NpgsqlCommand(Queries.CheckSeClienteExiste, connection);
+        await using var cmd = new NpgsqlCommand(Queries.CheckSeClienteExiste, _connection);
 
         cmd.Parameters.AddWithValue("clienteId", clienteId);
         var resultObj = await cmd.ExecuteScalarAsync();
@@ -32,11 +32,11 @@ public class TransactionDb(NpgsqlDataSource _dataSource)
         return result == 1;
     }
 
-    private static async Task<bool> UpdateClinte(NpgsqlConnection connection, TransacaoReq transacao, int clienteId)
+    private async Task<bool> UpdateClinte(TransacaoReq transacao, int clienteId)
     {
         var sum = transacao.Tipo == "d" ? transacao.Valor * -1 : transacao.Valor;
 
-        await using var cmd = new NpgsqlCommand(Queries.UpdateSaldoCliente, connection);
+        await using var cmd = new NpgsqlCommand(Queries.UpdateSaldoCliente, _connection);
 
         cmd.Parameters.AddWithValue("sum", sum);
         cmd.Parameters.AddWithValue("ClienteId", clienteId);
@@ -47,9 +47,9 @@ public class TransactionDb(NpgsqlDataSource _dataSource)
         return count > 0;
     }
 
-    private static async Task<Result<TransacaoResp>> InsertTransacao(NpgsqlConnection connection, TransacaoReq transacao, int clienteId)
+    private async Task<Result<TransacaoResp>> InsertTransacao(TransacaoReq transacao, int clienteId)
     {
-        await using var cmd = new NpgsqlCommand(Queries.InsereTransacao, connection);
+        await using var cmd = new NpgsqlCommand(Queries.InsereTransacao, _connection);
 
         cmd.Parameters.AddWithValue("clienteId", clienteId);
         cmd.Parameters.AddWithValue("valor", transacao.Valor);
@@ -58,7 +58,7 @@ public class TransactionDb(NpgsqlDataSource _dataSource)
 
         await cmd.ExecuteNonQueryAsync();
 
-        await using var queryCmd = new NpgsqlCommand(Queries.GetDadosCliente, connection);
+        await using var queryCmd = new NpgsqlCommand(Queries.GetDadosCliente, _connection);
         queryCmd.Parameters.AddWithValue("clienteId", clienteId);
         using var reader = await queryCmd.ExecuteReaderAsync();
 

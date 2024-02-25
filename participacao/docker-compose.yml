@@ -7,7 +7,7 @@ services:
     image: rinha-backend-2024:latest
     hostname: api01
     environment:
-      - ConnectionStrings__pgsql=Host=db;Username=postgresUser;Password=postgresPW;Database=postgresDB
+      - ConnectionStrings__pgsql=Host=db;Username=postgresUser;Password=postgresPW;Database=postgresDB;Minimum Pool Size=10;Maximum Pool Size=30
     
     # Não é necessário expor qualquer porta além da porta do load balancer,
     # mas é comum as pessoas o fazerem para testarem suas APIs e conectarem
