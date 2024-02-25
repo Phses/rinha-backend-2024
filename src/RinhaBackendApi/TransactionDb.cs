@@ -2,8 +2,15 @@
 
 namespace RinhaBackendApi;
 
-public class TransactionDb(NpgsqlConnection _connection)
+public class TransactionDb
 {
+    private readonly NpgsqlDataSource _dataSource;
+    private readonly NpgsqlConnection _connection;
+    public TransactionDb(NpgsqlDataSource dataSource)
+    {
+        _dataSource = dataSource;
+        _connection = _dataSource.OpenConnection();
+    }
     public async Task<Result<TransacaoResp>> Add(TransacaoReq transacao, int clienteId)
     {
         await _connection.OpenAsync();

@@ -2,8 +2,15 @@
 
 namespace RinhaBackendApi;
 
-public class ExtratoDb(NpgsqlConnection _connection)
+public class ExtratoDb
 {
+    private readonly NpgsqlDataSource _dataSource;
+    private readonly NpgsqlConnection _connection;
+    public ExtratoDb(NpgsqlDataSource dataSource)
+    {
+        _dataSource = dataSource;
+        _connection = _dataSource.OpenConnection();
+    }
     public async Task<Result<Extrato>> Get(int clienteId)
     {
         await _connection.OpenAsync();
