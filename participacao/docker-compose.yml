@@ -7,7 +7,7 @@ services:
     image: rinha-backend-2024:latest
     hostname: api01
     environment:
-      - DB_HOSTNAME=db
+      - ConnectionStrings__pgsql=Host=db;Username=postgresUser;Password=postgresPW;Database=postgresDB
     
     # Não é necessário expor qualquer porta além da porta do load balancer,
     # mas é comum as pessoas o fazerem para testarem suas APIs e conectarem
@@ -26,10 +26,8 @@ services:
     # Essa sintaxe reusa o que foi declarado em 'api01'.
     <<: *api 
     hostname: api02
-    environment:
-      - DB_HOSTNAME=db
     ports:
-      - "8000:8080"
+      - "8001:8080"
  
   nginx:
     image: nginx:latest
@@ -51,11 +49,11 @@ services:
     image: postgres:latest
     hostname: db
     environment:
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_USER=admin
-      - POSTGRES_DB=rinha
+      - POSTGRES_PASSWORD=postgresPW
+      - POSTGRES_USER=postgresUser
+      - POSTGRES_DB=postgresDB
     ports:
-      - "5432:5432"
+      - "5455:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     deploy:
