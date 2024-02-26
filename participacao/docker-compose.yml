@@ -7,7 +7,7 @@ services:
     image: rinha-backend-2024:latest
     hostname: api01
     environment:
-      - ConnectionStrings__pgsql=Host=db;Username=postgresUser;Password=postgresPW;Database=postgresDB;Minimum Pool Size=10;Maximum Pool Size=30
+      - ConnectionStrings__pgsql=Host=db;Username=postgresUser;Password=postgresPW;Database=postgresDB;Minimum Pool Size=30;Maximum Pool Size=100;Multiplexing=true;
     
     # Não é necessário expor qualquer porta além da porta do load balancer,
     # mas é comum as pessoas o fazerem para testarem suas APIs e conectarem
@@ -19,8 +19,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
-          memory: "200MB"
+          cpus: "0.4"
+          memory: "80MB"
 
   api02:
     # Essa sintaxe reusa o que foi declarado em 'api01'.
@@ -42,8 +42,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.17"
-          memory: "10MB"
+          cpus: "0.2"
+          memory: "50MB"
 
   db:
     image: postgres:latest
@@ -63,8 +63,8 @@ services:
           # aqui declarados é de 1.5 unidades de CPU e 550MB
           # de memória. A distribuição feita aqui é apenas
           # um exemplo – distribua como quiser.
-          cpus: "0.13"
-          memory: "140MB"
+          cpus: "0.5"
+          memory: "340MB"
 
 # O uso do modo `bridge` deve ser adequado à carga que será usada no teste.
 # A edição anterior se beneficiou do modo host pois o volume de requisições
