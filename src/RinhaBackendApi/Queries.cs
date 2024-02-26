@@ -28,7 +28,7 @@ public static class Queries
     public const string GetSaldo = @"SELECT limite, NOW() as data_extrato, saldo 
                                      FROM Cliente WHERE Id = @clienteId";
 
-    public const string GetTransacoes = @"SELECT t.valor, t.tipo, t.descricao, t.realizadaEm 
+    public const string GetTransacoes = @"SELECT t.valor, t.tipo, t.descricao, t.realizada_em 
                                             FROM Transacao t WHERE ClienteId = @clienteId
                                             ORDER BY t.realizada_em
                                             LIMIT 10";
