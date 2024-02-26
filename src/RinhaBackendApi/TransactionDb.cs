@@ -34,7 +34,7 @@ public class TransactionDb(NpgsqlDataSource _dataSource)
 
     private async Task<bool> UpdateClinte(TransacaoReq transacao, int clienteId, NpgsqlConnection connection)
     {
-        var sum = transacao.Tipo == "d" ? transacao.Valor * -1 : transacao.Valor;
+        var sum = transacao.tipo == "d" ? transacao.valor * -1 : transacao.valor;
 
         await using var cmd = new NpgsqlCommand(Queries.UpdateSaldoCliente, connection);
 
@@ -52,9 +52,9 @@ public class TransactionDb(NpgsqlDataSource _dataSource)
         await using var cmd = new NpgsqlCommand(Queries.InsereTransacao, connection);
 
         cmd.Parameters.AddWithValue("clienteId", clienteId);
-        cmd.Parameters.AddWithValue("valor", transacao.Valor);
-        cmd.Parameters.AddWithValue("tipo", transacao.Tipo);
-        cmd.Parameters.AddWithValue("descricao", transacao.Descricao);
+        cmd.Parameters.AddWithValue("valor", transacao.valor);
+        cmd.Parameters.AddWithValue("tipo", transacao.tipo);
+        cmd.Parameters.AddWithValue("descricao", transacao.descricao);
 
         await cmd.ExecuteNonQueryAsync();
 
@@ -67,7 +67,7 @@ public class TransactionDb(NpgsqlDataSource _dataSource)
             int limite = reader.GetInt32(0);
             int saldo = reader.GetInt32(1);
 
-            return new TransacaoResp(Limite: limite, Saldo: saldo);
+            return new TransacaoResp(limite: limite, saldo: saldo);
         }
 
         return Result<TransacaoResp>.WithError();

@@ -1,12 +1,12 @@
 ﻿namespace RinhaBackendApi;
 
 //Todo: criar enum c para credito e d para debito
-public record TransacaoReq(int Valor, string Tipo, string Descricao);
+public record TransacaoReq(int valor, string tipo, string descricao);
 
-public record TransacaoResp(int Limite, int Saldo);
+public record TransacaoResp(int limite, int saldo);
 
-public record Extrato(Saldo Saldo, List<Transacao> Transacoes);
+public record Extrato(Saldo saldo, List<Transacao> transacoes);
 
-public record Saldo(int Total, DateTime DataExtrato, int Limite);
+public record Saldo(int total, DateTime data_extrato, int limite);
 
-public record Transacao(int Valor, string Tipo, string Descricao, DateTime RealizadaEm);
+public record Transacao(int valor, string tipo, string descricao, DateTime realizada_em);

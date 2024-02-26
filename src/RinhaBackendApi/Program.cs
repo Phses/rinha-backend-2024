@@ -29,7 +29,7 @@ var extratoDb = app.Services.GetRequiredService<ExtratoDb>();
 
 app.MapPost("/clientes/{id}/transacoes", async Task<Results<Ok<TransacaoResp>, NotFound, BadRequest ,UnprocessableEntity>> (int id, [FromBody] TransacaoReq transacao) =>
 {
-    var tipoValido = transacao.Tipo == "d" || transacao.Tipo == "c";
+    var tipoValido = transacao.tipo == "d" || transacao.tipo == "c";
 
     if (!tipoValido)
         return TypedResults.BadRequest();

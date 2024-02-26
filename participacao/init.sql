@@ -1,21 +1,21 @@
-CREATE TABLE Cliente(
-	Id SERIAL PRIMARY KEY,
-	Limite INT NOT NULL,
-	Saldo INT NOT NULL
+CREATE TABLE cliente(
+	id SERIAL PRIMARY KEY,
+	limite INT NOT NULL,
+	saldo INT NOT NULL
 );
 
-CREATE TABLE Transacao(
-	Id SERIAL PRIMARY KEY,
-	ClienteId INT NOT NULL,
-	Valor INT NOT NULL,
-	Tipo CHAR(1) not null,
-	Descricao VARCHAR(10) NOT NULL,
-	RealizadaEm TIMESTAMP DEFAULT now(),
+CREATE TABLE transacao(
+	id SERIAL PRIMARY KEY,
+	cliente_id INT NOT NULL,
+	valor INT NOT NULL,
+	tipo CHAR(1) not null,
+	descricao VARCHAR(10) NOT NULL,
+	realizada_em TIMESTAMP DEFAULT now(),
 
-	FOREIGN KEY (ClienteId) REFERENCES Cliente (Id)
+	FOREIGN KEY (cliente_id) REFERENCES cliente (Id)
 );
 
-INSERT INTO Cliente(Limite, Saldo) 
+INSERT INTO cliente(limite, saldo) 
 VALUES 
     (100000, 0),
     (80000, 0),

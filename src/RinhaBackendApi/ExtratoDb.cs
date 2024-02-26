@@ -43,7 +43,7 @@ public class ExtratoDb(NpgsqlDataSource dataSource)
             DateTime dataExtrato = reader.GetDateTime(1);
             int saldo = reader.GetInt32(2);
 
-            return new Saldo(Limite: limite, DataExtrato: dataExtrato, Total: saldo);
+            return new Saldo(limite: limite, data_extrato: dataExtrato, total: saldo);
         }
 
         return null;
