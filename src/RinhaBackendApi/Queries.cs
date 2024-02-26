@@ -29,7 +29,7 @@ public static class Queries
                                      FROM Cliente WHERE Id = @clienteId";
 
     public const string GetTransacoes = @"SELECT t.valor, t.tipo, t.descricao, t.realizada_em 
-                                            FROM Transacao t WHERE ClienteId = @clienteId
+                                            FROM Transacao t WHERE t.cliente_id = @clienteId
                                             ORDER BY t.realizada_em
                                             LIMIT 10";
 
