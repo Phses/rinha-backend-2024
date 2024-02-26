@@ -14,14 +14,12 @@ public static class Queries
                                                 cliente_id, 
                                                 valor,
                                                 tipo,
-                                                descricao,
-                                                realizada_em) 
+                                                descricao) 
                                            VALUES (
                                                 (@clienteId), 
                                                 (@valor),                                                
                                                 (@tipo),
-                                                (@descricao),
-                                                (NOW())
+                                                (@descricao)
                                             )";
 
     public const string GetDadosCliente = @"SELECT limite, saldo 
